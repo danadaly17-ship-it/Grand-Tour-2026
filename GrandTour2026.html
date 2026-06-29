@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Grand Tour 2026"/>
+<title>Grand Tour 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D1B3E;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;color:#f0f4ff;max-width:480px;margin:0 auto;padding-bottom:84px;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+a{cursor:pointer}
+select{font-family:inherit;-webkit-appearance:none;appearance:none}
+::-webkit-scrollbar{display:none}
+.screen{display:none;padding:18px 14px}
+.screen.active{display:block}
+.header{background:linear-gradient(160deg,#12224f 0%,#0D1B3E 100%);padding:28px 20px 16px;border-bottom:1px solid #1a2d50;position:sticky;top:0;z-index:10}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#080f1e;border-top:1px solid #1a2d50;display:flex;z-index:20}
+.nav button{flex:1;background:none;border:none;padding:10px 0 14px;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid transparent;color:#3a5070;font-size:10px;font-weight:600}
+.nav button.active{border-top-color:#9B8FFF;color:#c4b5fd}
+.nav .icon{font-size:18px}
+.card{background:#152033;border:1px solid #1e3352;border-radius:12px;padding:14px;margin-bottom:8px}
+.card.clickable{cursor:pointer}
+.back-btn{background:none;border:none;color:#94a3b8;font-size:14px;margin-bottom:14px;padding:0;display:flex;align-items:center;gap:6px}
+.hero{border-radius:16px;padding:20px 18px;margin-bottom:14px}
+.tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block}
+.confirmed{background:#0a2e1a;color:#4ade80}
+.pending{background:#1a1a2e;color:#c4b5fd}
+.booknow{background:#2e1a00;color:#fbbf24}
+.pill{border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;border:1.5px solid;white-space:nowrap;flex-shrink:0;background:#152033;color:#94a3b8;border-color:#1e3352}
+.pill.active{color:#fff}
+.pills{display:flex;gap:7px;overflow-x:auto;padding-bottom:12px;margin-bottom:14px}
+.filter-btn{flex:1;border-radius:10px;padding:9px 0;font-size:13px;font-weight:600;border:1.5px solid #1e3352;background:#152033;color:#94a3b8}
+.filter-btn.active{background:#7B6FF0;border-color:#7B6FF0;color:#fff}
+.timeline-dot{border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.timeline-line{width:1px;flex:1;margin-top:3px;min-height:12px}
+.note{color:#fde68a;font-size:13px;margin-top:10px;background:rgba(251,191,36,0.08);padding:10px 12px;border-radius:8px;border-left:3px solid #fbbf24;line-height:1.5}
+.todo-box{background:#180e00;border:1px solid #3a2200;border-radius:12px;padding:14px}
+.conf-box{background:#081628;border:1px solid #1e3352;border-radius:12px;padding:14px;margin-bottom:12px}
+.code{font-family:monospace;color:#f0f4ff;background:#0a1628;padding:2px 7px;border-radius:4px}
+.attr-btn{background:#0e1e33;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px;border:1px solid}
+.did-you-know{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:14px;margin-bottom:12px}
+.our-visit{border-radius:12px;padding:14px}
+.section-label{font-weight:700;font-size:11px;letter-spacing:1.2px;margin-bottom:10px;text-transform:uppercase}
+.gf-tag{background:rgba(74,222,128,0.1);color:#4ade80;font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600}
+input,select{width:100%;background:#152033;border:1.5px solid #1e3352;color:#f0f4ff;border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:10px;color:#9B8FFF;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:4px">Summer 2026 · Jay's 50th</div>
+  <div style="font-size:20px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:3px">'Ello, Ciao, Bonjour ✈️</div>
+  <div style="font-size:14px;font-weight:600;color:#9B8FFF;margin-bottom:3px">The 2026 Grand Tour</div>
+  <div style="font-size:11px;color:#4a6080">Jul 27 – Aug 22 · London · Rome · Florence · Venice · Cruise · Barcelona</div>
+</div>
+
+<div id="screen-itinerary" class="screen active"></div>
+<div id="screen-cities" class="screen"></div>
+<div id="screen-logistics" class="screen"></div>
+<div id="screen-gf" class="screen"></div>
+
+<nav class="nav">
+  <button onclick="showTab('itinerary')" id="nav-itinerary" class="active"><span class="icon">🗓️</span>Itinerary</button>
+  <button onclick="showTab('cities')" id="nav-cities"><span class="icon">🏛️</span>City Guide</button>
+  <button onclick="showTab('logistics')" id="nav-logistics"><span class="icon">🏨</span>Logistics</button>
+  <button onclick="showTab('gf')" id="nav-gf"><span class="icon">🌾</span>GF Guide</button>
+</nav>
+
+<script>
+const PC={london:{a:"#9B8FFF"},rome:{a:"#E8547A"},florence:{a:"#00C4D8"},venice:{a:"#B794F4"},cruise:{a:"#60C8F5"},barcelona:{a:"#F687B3"}};
+const TI={transport:"🚌",activity:"🎯",hotel:"🏨",food:"🍽️",free:"☀️"};
+
+const ATTR={
+  colosseum:{title:"The Colosseum",emoji:"🏛️",heroFact:"Built in just 8 years — nearly 2,000 years old",imageSearch:"https://www.google.com/search?q=Colosseum+Rome+interior&tbm=isch",officialUrl:"https://www.colosseo.it",history:"The Colosseum was commissioned by Emperor Vespasian in AD 72 and inaugurated by his son Titus in AD 80 with 100 days of games — over 9,000 animals killed and 2,000 people died in the opening celebrations alone. The name comes not from the building but from the Colossus of Nero, a 30-metre bronze statue that once stood beside it.",highlights:[{i:"👥",l:"50,000–80,000 spectators",d:"More than most modern NFL stadiums. Seating was strictly tiered by class — senators at ringside, slaves at the top. 80 numbered entrances could fill and empty it in under 15 minutes."},{i:"🕳️",l:"The Hypogeum",d:"A two-level labyrinth beneath the floor with 80 elevators powered by counterweights. Gladiators, animals, and scenery appeared dramatically through trapdoors."},{i:"🪨",l:"The Arena Floor",d:"Originally wooden planks covered in sand — 'harena' in Latin, where the word 'arena' comes from. The sand absorbed blood from the contests."},{i:"✨",l:"Symbol against the death penalty",d:"Today, whenever a death sentence is commuted anywhere in the world, Rome lights the Colosseum gold in celebration."}],didYouKnow:"The pockmarks covering the Colosseum exterior are where medieval Romans pried out iron clamps to melt down for weapons. Some of those stones were used to build St. Peter's Basilica.",ourVisit:"Your Angel Tours guide takes you through the tiers and arena floor on Aug 3. A guide transforms this from impressive rubble into a visceral story about power and spectacle."},
+  gladiatorSchool:{title:"Gladiator School",emoji:"⚔️",heroFact:"Train like an actual Roman gladiator in the shadow of the Colosseum",imageSearch:"https://www.google.com/search?q=gladiator+school+Rome+training&tbm=isch",officialUrl:"https://www.gruppostoricoromano.it",history:"The Ludus Magnus — Rome's greatest gladiatorial training school — stood just east of the Colosseum, connected by an underground tunnel. Gladiators trained for years in specific fighting styles: the armoured Secutor, the net-and-trident Retiarius, the small-shield Thraex. Today the Gruppo Storico Romano recreates these techniques with historically accurate equipment.",highlights:[{i:"🛡️",l:"Gladiator classes",d:"You'll learn the fighting stances, attack combinations, and defensive techniques of different gladiatorial types. The trainers are historians as much as athletes."},{i:"🏆",l:"Not just slaves",d:"Many gladiators were volunteers — the salary, fame, and status were genuinely attractive. Successful gladiators became celebrities with fan clubs."},{i:"🎭",l:"The thumbs up/down myth",d:"Historians now believe both thumbs up AND down signaled death — a closed fist meant mercy. The Hollywood version is wrong."}],didYouKnow:"Gladiators rarely fought to the death — they were expensive professionals. Sponsors lost real money when one died. The crowd often voted to spare the loser.",ourVisit:"Axel is going to love this. You'll leave with gladiator certificates. Wear comfortable clothes. This is the highlight of Rome for the kids."},
+  vatican:{title:"Vatican & Sistine Chapel",emoji:"⛪",heroFact:"Michelangelo painted the Sistine Chapel ceiling in 4 years — lying on his back",imageSearch:"https://www.google.com/search?q=Sistine+Chapel+ceiling+Michelangelo&tbm=isch",officialUrl:"https://www.museivaticani.va",history:"The Vatican Museums hold one of the world's greatest art collections — 54 galleries accumulated over 500 years. The Sistine Chapel took Michelangelo 4 years and features 343 figures across 5,000 square feet of ceiling. He was 33 when he started, had never painted a fresco before, and was furious about taking the commission. The result changed Western art forever.",highlights:[{i:"✋",l:"The Creation of Adam",d:"The most reproduced religious painting in history. Many art historians believe the shape surrounding God is an anatomically perfect cross-section of the human brain — Michelangelo secretly dissected corpses."},{i:"🔮",l:"The Last Judgment",d:"The massive altar wall added 25 years later. Michelangelo painted himself as a flayed human skin held by Saint Bartholomew — a tortured self-portrait."},{i:"🗺️",l:"Gallery of Maps",d:"40 maps of 16th-century Italy in fresco along a 120-metre corridor, painted in just 3 years. Staggeringly detailed and usually overlooked."},{i:"🕊️",l:"St. Peter's Basilica",d:"The largest church in the world. Michelangelo designed the dome. Bernini designed the colonnade. The Pietà was carved by Michelangelo at age 24."}],didYouKnow:"In the Sistine Chapel scene of David and Goliath, Michelangelo painted his own face on Goliath's severed head — held up by a young David. Art history's most passive-aggressive signature.",ourVisit:"LivTours gets you in at 7:30am Aug 4 before the crowds. Without a guide the Chapel is overwhelming — with context it's astonishing. Conf: LVO 671479."},
+  borghese:{title:"Borghese Gardens & Rowboats",emoji:"🌳",heroFact:"Rome's most beautiful park — you can row a boat through it",imageSearch:"https://www.google.com/search?q=Borghese+Gardens+Rome+lake+rowboat&tbm=isch",officialUrl:"https://www.borghese.gallery",history:"Villa Borghese was built in the early 1600s as the estate of Cardinal Scipione Borghese, nephew of Pope Paul V, to house his extraordinary art collection — Bernini sculptures, Raphael paintings, Caravaggio masterpieces. The 80-hectare gardens are now Rome's most beautiful public park.",highlights:[{i:"🚣",l:"The Rowboat Lake",d:"Rent a rowboat and drift under the umbrella pines. The little temple of Aesculapius reflects in the water. One of the most quietly beautiful things you can do in Rome. Cash only."},{i:"🎨",l:"Galleria Borghese",d:"Inside: Bernini's Apollo and Daphne (a woman turning into a tree in marble), Pluto and Persephone (fingers pressing into marble flesh), and six Caravaggios. Separate timed ticket required."},{i:"🌲",l:"The umbrella pines",d:"The distinctive flat-topped stone pines are symbols of Roman identity. They line the Borghese paths and provide crucial shade in August heat."}],didYouKnow:"Cardinal Borghese would arrange for art he wanted to 'acquire' to be confiscated on trumped-up charges, then graciously accept it as a gift. 17th-century acquisition strategy.",ourVisit:"Great afternoon after the Vatican on Aug 4. Rowboats are cash only. Allow 1.5–2 hours. Jay's back should be fine — mostly flat paths."},
+  golfCartRome:{title:"Golf Cart City Tour",emoji:"🛺",heroFact:"Cover 10 Rome landmarks in 4 hours without destroying your feet",imageSearch:"https://www.google.com/search?q=Rome+golf+cart+tour+highlights&tbm=isch",officialUrl:null,history:"Rome's historic centre packs an impossible density of landmarks into a walkable area — but in August heat, hitting the Colosseum, Pantheon, Piazza Navona, Trevi Fountain, and Spanish Steps in a single day is brutal. Angel Tours' golf cart covers the same ground in 4 hours with a guide narrating the whole way.",highlights:[{i:"⛲",l:"Trevi Fountain",d:"The largest Baroque fountain in Rome, completed 1762. Toss a coin over your left shoulder with your right hand — legend guarantees your return. About €1.5 million thrown in per year, all to charity."},{i:"🏛️",l:"The Pantheon",d:"Built in 125 AD. The world's largest unreinforced concrete dome — nobody is entirely sure how the Romans built it. The oculus (open hole at the top) is 9 metres wide and the only light source."},{i:"🎭",l:"Piazza Navona",d:"Built on top of an ancient Roman stadium. Bernini's Fountain of the Four Rivers at the centre. Street artists, cafes, tourists — chaotic and wonderful."}],didYouKnow:"The Pantheon's dome was the world's largest for 1,300 years. It was finally surpassed in 1436 by Brunelleschi's dome in Florence — which you'll also see on this trip.",ourVisit:"Aug 2, 10am–2pm with Angel Tours. Best way to orient the family before going deep on specific sites."},
+  david:{title:"Accademia Gallery — Statue of David",emoji:"🗿",heroFact:"17 feet tall, carved from a single block of marble in just over 2 years",imageSearch:"https://www.google.com/search?q=Michelangelo+David+statue+Florence&tbm=isch",officialUrl:"https://www.galleriaaccademiafirenze.it",history:"Michelangelo's David was commissioned in 1501 when he was 26. The marble block had been sitting abandoned in a Florence workshop for 25 years — two sculptors had already tried and quit. Michelangelo finished it in just over 2 years. It was intended for the Cathedral roof but was so magnificent the city placed it at the Palazzo della Signoria entrance instead.",highlights:[{i:"👀",l:"The Eyes",d:"David's eyes are turned slightly, gazing toward his enemy Goliath. His expression captures the moment just before the fight — tense, focused, fearless. Michelangelo called it capturing the 'divine fury.'"},{i:"✋",l:"The Hands",d:"The hands are disproportionately large — intentionally. Michelangelo emphasized them because David's weapon was a sling held in his hand. Art historians call it 'heroic exaggeration.'"},{i:"📐",l:"The unfinished Prisoners",d:"On either side of the same gallery are Michelangelo's 'Prisoners' — figures appearing to struggle out of the marble, left deliberately unfinished. Haunting."}],didYouKnow:"David has a small crack in his left ankle from 1991, when someone attacked it with a hammer. Stable and monitored — which is why the Accademia is strict about not touching him.",ourVisit:"Tickets confirmed for 8:15am Aug 6 (Order #23054762). Go early before the crowds. The moment you walk into the Tribune and see him at the end of the hall is genuinely breathtaking."},
+  galileoMuseum:{title:"Galileo Museum",emoji:"🔭",heroFact:"Galileo's actual telescopes — the ones he used to discover Jupiter's moons in 1609",imageSearch:"https://www.google.com/search?q=Galileo+Museum+Florence+telescopes&tbm=isch",officialUrl:"https://www.museogalileo.it",history:"Galileo Galilei (1564–1642) was Florence's court mathematician under the Medici. In 1609 he used his telescope to discover Jupiter had four moons — the first evidence that not everything orbited the Earth. The Church put him under house arrest for publishing this. The museum holds two of his original telescopes and his preserved middle finger.",highlights:[{i:"🔭",l:"The Original Telescopes",d:"Two working telescopes handmade by Galileo in 1609. He discovered Jupiter's four largest moons in just 10 days of observation."},{i:"☝️",l:"The Finger",d:"Galileo's preserved right middle finger is displayed in a glass egg on a pedestal. Removed during reburial in 1737. Make of that what you will."},{i:"🧲",l:"Working models",d:"Reconstructions of historical instruments that visitors can handle — astrolabes, barometers, armillary spheres. Axel will love these."}],didYouKnow:"In 1992 — 350 years after Galileo's death — Pope John Paul II formally admitted the Church had been wrong to condemn him. It took a while.",ourVisit:"Perfect for Axel on Aug 7. About 1.5 hours. Combine with Da Vinci Museum nearby while Dana and Grace shop."},
+  daVinciMuseum:{title:"Da Vinci Museum",emoji:"🎭",heroFact:"Working models of Leonardo's flying machines, tanks, and armoured vehicles — 500 years early",imageSearch:"https://www.google.com/search?q=Da+Vinci+Museum+Florence+flying+machine&tbm=isch",officialUrl:"https://www.mostredileonardo.com",history:"Leonardo da Vinci (1452–1519) grew up near Florence under Medici patronage. His notebooks contain designs for a helicopter, a tank, a solar concentrator, and a calculator — all centuries before they were built. Florence's Da Vinci Museum brings them to life with full-scale working models.",highlights:[{i:"✈️",l:"The Aerial Screw",d:"Da Vinci's helicopter design from 1489. The concept — a rotating screw that generates lift — is fundamentally correct. It just needed an engine 400 years later."},{i:"🛡️",l:"Armoured Vehicle",d:"A 360-degree cannon-armed fighting vehicle from 1487 — essentially a tank. One flaw: the gear mechanism was backwards so it couldn't move. Some think Leonardo did this intentionally."},{i:"🌉",l:"Self-Supporting Bridge",d:"A bridge that holds together with interlocking pieces — no nails or rope. You can build a model in the museum. The design works perfectly."}],didYouKnow:"Leonardo was left-handed and wrote all his notebooks in mirror script — right to left — only readable in a mirror. To prevent idea theft, or just because he was eccentric. Probably both.",ourVisit:"Jay and Axel on Aug 7 while Dana and Grace shop at Santa Maria Novella. About 1–1.5 hours."},
+  piazzaleMichelangelo:{title:"Piazzale Michelangelo",emoji:"🌅",heroFact:"The most famous view in Florence — the whole city laid out below you",imageSearch:"https://www.google.com/search?q=Piazzale+Michelangelo+Florence+golden+hour&tbm=isch",officialUrl:null,history:"Piazzale Michelangelo was designed in 1869 as part of a grand boulevard circling Florence's hills. The terrace holds bronze copies of Michelangelo's greatest works and commands a panoramic view of the entire Arno Valley: red-tiled rooftops, Brunelleschi's cathedral dome, the Palazzo Vecchio tower, bridges stretching across the river.",highlights:[{i:"🌆",l:"The panorama",d:"On a clear evening you can see the entire city — Brunelleschi's dome, Giotto's bell tower, the hills of Fiesole in the distance. One of the great urban panoramas in the world."},{i:"🌇",l:"Golden hour",d:"The Florence skyline at golden hour turns the stone buildings amber and the Arno gold. The light lasts about 45 minutes. This is the moment."},{i:"🚶",l:"The walk back down",d:"The descent through Oltrarno brings you through some of Florence's best streets — artisan leather workshops, wine bars, local restaurants tourists rarely find."}],didYouKnow:"The rose garden just below (Giardino delle Rose) is free, usually uncrowded, and has views almost as good. Worth a detour if Jay's back needs a rest from steps.",ourVisit:"Taxi up, walk back down on arrival day Aug 5. Perfect first Florence moment. Buy something cold and just sit with it."},
+  santaMariaNovellaShop:{title:"Santa Maria Novella Pharmacy",emoji:"🌸",heroFact:"The world's oldest pharmacy — founded by Dominican friars in 1221",imageSearch:"https://www.google.com/search?q=Santa+Maria+Novella+pharmacy+Florence+interior&tbm=isch",officialUrl:"https://www.smnovella.com",history:"Founded in 1221 by Dominican monks growing medicinal herbs in their cloister garden. By the 16th century they were making perfumes for Catherine de' Medici, who took their Acqua della Regina fragrance to France when she became Queen — some say this was the origin of French perfumery. Still operating from the original 13th-century location with frescoed ceilings and Gothic arches.",highlights:[{i:"🌹",l:"The fragrances",d:"Complex, botanical, aged — totally unlike department store perfumes. Melograno (pomegranate) and Pot Pourri are classics. The Rose Water formula dates to 1381."},{i:"🧴",l:"Skin care",d:"Face creams, soaps, and herbal remedies made to centuries-old formulas. The Santa Maria Novella soap is considered one of the finest in the world."},{i:"🎁",l:"Perfect gifts",d:"Wax-sealed bottles, hand-tied ribbons, no plastic. Small enough for a suitcase, memorable enough to last."}],didYouKnow:"Catherine de' Medici's perfumer, brought from Florence to France, is sometimes credited with establishing French perfumery. Florence taught Paris how to smell good.",ourVisit:"Dana and Grace's stop on Aug 7 while Jay and Axel do Da Vinci. Budget time — easy to spend an hour just smelling things. Budget money too."},
+  dogesPalace:{title:"Doge's Palace",emoji:"🏛️",heroFact:"Seat of Venetian power for 700 years — home to the world's largest oil painting",imageSearch:"https://www.google.com/search?q=Doge%27s+Palace+Venice+interior+Tintoretto&tbm=isch",officialUrl:"https://palazzoducale.visitmuve.it",history:"The Palazzo Ducale was the residence of the Doge and the centre of Venetian government from the 9th century until 1797. For nearly a millennium Venice was the most powerful maritime empire in the Mediterranean. The palace holds Tintoretto's Paradise — at 22×7 metres, the largest oil painting in the world — and the Bridge of Sighs connecting the palace to its prison.",highlights:[{i:"🎨",l:"Tintoretto's Paradise",d:"22 metres wide, 7 metres tall, painted when Tintoretto was 70 years old. 500 figures depicting every saint in heaven. He beat Veronese in a competition for the commission."},{i:"😮",l:"Bridge of Sighs",d:"The covered bridge connecting the palace to the New Prison. Prisoners crossed it after sentencing — their last glimpse of Venice. Legend says lovers who kiss beneath it in a gondola gain eternal love."},{i:"🗝️",l:"Secret Passages",d:"Behind the painted walls are hidden staircases, spy chambers, and the Piombi — lead-roofed prison cells where Casanova was imprisoned and made his famous escape."},{i:"⚖️",l:"The Council of Ten",d:"Venice's feared secret police, operating from the palace. They had power of life and death over any Venetian citizen and the most effective intelligence network in Europe."}],didYouKnow:"Casanova was imprisoned in the Piombi in 1755. His escape — through the roof, across the city at night, out of Venice by boat — took 15 months of planning. He later wrote a famous memoir about it.",ourVisit:"4 tickets confirmed for 9am Aug 9. Adult codes: 1PGY2QU3ZZ / UXZBE9WN5E. Youth codes: XLCLB4U25X / PZ13VPWFAR. Allow 2 hours minimum."},
+  acquaAltaBookshop:{title:"Libreria Acqua Alta",emoji:"📚",heroFact:"Books in gondolas, bathtubs, and a staircase made entirely of encyclopaedias",imageSearch:"https://www.google.com/search?q=Libreria+Acqua+Alta+Venice+gondola+cats&tbm=isch",officialUrl:null,history:"Created by Luigi Frizzo near the Rialto. Because the shop floods regularly during Venice's acqua alta (high tides), Frizzo began storing books in gondolas, bathtubs, and waterproof barrels. What began as a practical solution became one of Venice's most beloved places.",highlights:[{i:"🚣",l:"Books in gondolas",d:"A full-sized gondola in the centre of the shop, filled to overflowing with books in a dozen languages. It protects them when the shop floods."},{i:"😺",l:"The cats",d:"Several cats live in the shop permanently. They sleep on the books, sit in the gondola, and wander over the counters. Extremely aware of their good situation."},{i:"📖",l:"The book staircase",d:"A staircase built from hundreds of old encyclopaedias leads to the canal wall. Visitors climb it for photos. The view over the canal from the top is beautiful."}],didYouKnow:"The shop has no real organization system. Books are arranged entirely by the owner's intuition and the gondola's practicalities. Somehow you always find something.",ourVisit:"15–30 minutes after the Doge's Palace on Aug 9 — 10 minute walk. Grace will love it. Great cheap Venice souvenirs (postcards, vintage maps)."},
+  stMarksBasilica:{title:"St. Mark's Basilica",emoji:"⛪",heroFact:"40,000 square feet of gold mosaic — the richest church in Christendom",imageSearch:"https://www.google.com/search?q=St+Mark+Basilica+Venice+gold+mosaics+interior&tbm=isch",officialUrl:"https://www.basilicasanmarco.it",history:"Built in 832 AD to house the relics of St. Mark the Evangelist, smuggled from Alexandria by Venetian merchants hidden under pork and cabbages (Muslim guards wouldn't touch the pork). The current building dates to 1063, covered in Byzantine gold mosaics that earned it the nickname 'the Golden Church.'",highlights:[{i:"✨",l:"The Gold Mosaics",d:"Every surface — ceiling, arches, walls — is covered with 40,000 square feet of gold mosaic depicting Biblical scenes. On a sunny afternoon the interior glows like it's lit from inside."},{i:"🐴",l:"The Bronze Horses",d:"Four bronze horses on the upper loggia (outside are replicas — originals inside). Stolen from Constantinople 1204, stolen by Napoleon 1797, returned to Venice 1815. Well-travelled."},{i:"💎",l:"Pala d'Oro",d:"The golden altarpiece with 2,000 gems — emeralds, rubies, sapphires, pearls. Small extra fee to see up close. Worth every euro."}],didYouKnow:"The body of St. Mark is believed buried beneath the high altar. When the relics were installed, they were placed inside the altar and promptly 'lost' — their exact location is still debated.",ourVisit:"Pre-book free timed entry (required to avoid queues). Aug 9 at 4pm. The light through the gold mosaics in late afternoon is extraordinary. Cover shoulders and knees."},
+  gondolaRide:{title:"Gondola Ride",emoji:"🚣",heroFact:"There are 400 gondoliers in Venice — all male until 2010",imageSearch:"https://www.google.com/search?q=Venice+gondola+ride+sunset+Grand+Canal&tbm=isch",officialUrl:null,history:"The gondola has been Venice's symbol for over 1,000 years. At peak there were 10,000; today about 400. Each is handmade, slightly asymmetric (left side wider to compensate for the gondolier's stroke), weighs 350kg, and takes two months to build from eight types of wood. A 1609 law decreed all must be painted black — to stop wealthy Venetians competing over who had the most elaborate boat.",highlights:[{i:"⬛",l:"Why are they black?",d:"A 1609 sumptuary law banned ornate gondolas to prevent one-upmanship between wealthy families. Venetian law enforcement: creative."},{i:"🎵",l:"The singing",d:"Serenading gondoliers are real — you have to request and pay extra. In the right canal at sunset, the acoustics under the bridges are genuinely beautiful."},{i:"🌅",l:"Golden hour",d:"45 minutes before sunset. Stone buildings turn warm gold, canals reflect the sky, tourist crowds thin. Don't pre-book — negotiate on-site for the best rate."}],didYouKnow:"In 2010, Giorgia Boscolo became the first female gondolier in Venetian history after fighting the guild for years. They had barred women for centuries.",ourVisit:"Aug 8 arrival evening. Negotiate on-site at golden hour. Standard rate ~€80 for 30 minutes. Don't pay more than €100. Don't rush it."},
+  venetianMasks:{title:"Ca' Macana Mask Workshop",emoji:"🎭",heroFact:"The atelier that made masks for Stanley Kubrick's Eyes Wide Shut",imageSearch:"https://www.google.com/search?q=Ca+Macana+Venice+mask+workshop+carnival&tbm=isch",officialUrl:"https://www.camacana.com",history:"Venice's carnival masks have a 1,000-year history. During Carnival, masks allowed a merchant to gamble alongside a nobleman, or a woman to walk freely unrecognized. Different types had rules: the Bauta (white full-face) allowed anonymous voting in council; the plague doctor's beak was worn by physicians. Ca' Macana, founded 1984, is one of Venice's oldest traditional mask-making workshops.",highlights:[{i:"🎬",l:"Eyes Wide Shut",d:"Stanley Kubrick commissioned Ca' Macana to make all the masks for the famous masked ball sequence (1999). The atelier still makes replicas of those exact designs."},{i:"🎨",l:"The craft",d:"Traditional masks are made from papier-mâché, painted with tempera, lacquered, and decorated with feathers, gems, and gold leaf. Each person makes and keeps their own."},{i:"🃏",l:"Commedia dell'Arte",d:"Many classic Venice mask types come from this improvised theatrical tradition. Harlequin and Pulcinella are recognizable even in today's cartoon descendants."}],didYouKnow:"At peak Venetian Carnival in the 18th century, the mask-wearing season lasted from October to Ash Wednesday — about four months. Venetians effectively lived half the year in disguise.",ourVisit:"Aug 8 afternoon. 2-hour workshop, English, private for your family. Each person makes two masks. Contact Ca' Macana directly to confirm booking."},
+  gotDubrovnik:{title:"Game of Thrones Tour — Dubrovnik",emoji:"🐉",heroFact:"King's Landing is real — and you're going to walk through it",imageSearch:"https://www.google.com/search?q=Dubrovnik+Game+of+Thrones+filming+locations&tbm=isch",officialUrl:"https://www.dubrovnikgameofthronestours.com",history:"Dubrovnik was chosen as the primary filming location for King's Landing in 2011. The medieval walled city required almost no set dressing — its marble streets, orange-roofed buildings, and sea-cliff setting made it perfect. Over 8 seasons, dozens of locations appeared on screen, making it one of the most recognized TV locations in the world.",highlights:[{i:"🏰",l:"Fort Lovrijenac — the Red Keep",d:"The fortress on the cliff outside the walls stood in for the Red Keep — where Cersei and Joffrey plotted. The views from the top over the Adriatic are extraordinary."},{i:"😰",l:"The Walk of Shame",d:"The actual steps of the Jesuit Church where Cersei's Walk of Atonement was filmed. Steep and very real — you'll feel them differently after seeing the show."},{i:"🗺️",l:"The City Walls",d:"The 2km walk along the medieval walls gives you the elevated view of the old town familiar from the show's establishing shots. Separate from the GoT tour."}],didYouKnow:"HBO paid the Croatian government approximately €2 million per season to film in Dubrovnik. The city now limits daily tourist numbers specifically because GoT tourism was overwhelming the old town.",ourVisit:"Aug 11. Private tour with Dario — €75/person + €180 guide fee. Pay CASH on the day. Confirm in advance. Dario knows spots the regular tours miss."},
+  amalfiBoat:{title:"Amalfi Coast by Boat",emoji:"⛵",heroFact:"The only way to truly see the Amalfi Coast is from the water",imageSearch:"https://www.google.com/search?q=Amalfi+Coast+boat+tour+Positano+from+sea&tbm=isch",officialUrl:null,history:"The Amalfi Coast stretches 50km along the southern Sorrentine Peninsula. The cliff-hugging towns — Positano, Amalfi, Praiano — cling to near-vertical rock faces above the Tyrrhenian Sea. UNESCO World Heritage Site since 1997. The Coast Road is spectacularly beautiful but one of Italy's most congested in August. Seeing it from the sea avoids all traffic.",highlights:[{i:"🌊",l:"Positano from the sea",d:"The most photographed view on the Amalfi Coast — pastel houses cascading down the cliff to the beach. You'll drift along it at low speed just to take it in."},{i:"🏊",l:"Swimming stops",d:"Blu Mediterraneo anchors at sea caves and grottos for swimming. Water is extraordinarily clear and warm in August — visibility sometimes 20 metres."},{i:"🍋",l:"Limoncello country",d:"The Coast grows the enormous Sfusato amalfitano lemons that make limoncello. You'll see lemon groves terraced up the cliffs."}],didYouKnow:"Amalfi was one of medieval Italy's most powerful maritime republics. It created the world's first maritime code of law (the Tavole Amalfitane) in the 9th century, governing Mediterranean trade for centuries.",ourVisit:"Aug 14, 9:30am from Marina di Salerno. Blu Mediterraneo — WhatsApp +39 389 959 1601. Confirmed. Bring swimwear, sunscreen, hat."},
+  pisaTower:{title:"Leaning Tower of Pisa",emoji:"🗼",heroFact:"It started leaning during construction — and they just kept building",imageSearch:"https://www.google.com/search?q=Leaning+Tower+Pisa+climb+inside+view&tbm=isch",officialUrl:"https://www.opapisa.it",history:"Construction began in 1173 and almost immediately tilted due to soft soil. Construction halted twice — nearly 100 years total. Ironically these pauses may have saved it: the soil had time to compress and stabilize. When Galileo dropped cannonballs from the top to prove mass doesn't affect gravity, it was already 300 years old.",highlights:[{i:"📐",l:"The lean",d:"Currently about 4 degrees off vertical — 3.9 metres from straight. Engineering work 1990–2001 actually reduced the lean slightly from its most dangerous point."},{i:"👣",l:"251 steps",d:"Marble steps spiraling around the hollow centre. Worn smooth and slightly tilted — you can physically feel the lean changing as you climb. Beautiful view from the top."},{i:"⚗️",l:"Galileo's experiment",d:"Galileo allegedly dropped two cannonballs of different weights to prove they'd fall at the same rate. Most historians think this was a thought experiment — but it became legend."}],didYouKnow:"The Tower is not actually the most tilted building in the world. The Suurhusen church tower in Germany leans 5.19 degrees. Just significantly less famous.",ourVisit:"4 tickets confirmed, Aug 16 at 9:00am. Conf: 2228643737-01. €80 total. ⚠️ Leave ALL bags at the cloakroom before entry. Late arrivals not refunded."},
+  sagradaFamilia:{title:"Sagrada Família",emoji:"⛪",heroFact:"Under construction since 1882 — and Gaudí is buried in the crypt",imageSearch:"https://www.google.com/search?q=Sagrada+Familia+interior+columns+light&tbm=isch",officialUrl:"https://www.sagradafamilia.org",history:"Antoni Gaudí took over the project in 1883 at age 31 and spent 43 years working on it, living on-site for the final 15 years. In 1926 he was hit by a tram and died in hospital — initially nobody recognized him and he was almost buried as a pauper. He left only about 25% complete. The rest was reconstructed from drawings and models, many destroyed in the Spanish Civil War.",highlights:[{i:"🌲",l:"The Forest Interior",d:"The columns branch like trees toward the ceiling, creating a stone forest. Light comes through stained glass in greens, blues, and ambers — morning light cool on the east, warm afternoon light on the west. Intentional."},{i:"🏗️",l:"Still being built",d:"Expected to complete around 2026 — the centenary of Gaudí's death. The central tower will reach 172.5 metres, slightly below Montjuïc hill — Gaudí said no human work should exceed God's creation."},{i:"🕊️",l:"Three facades",d:"Nativity Facade (east, ornate) was the only one Gaudí saw finished. Passion Facade (west, stark, like bones) depicts the crucifixion. Glory Facade (south) is still unfinished."}],didYouKnow:"When Gaudí died, his pocket contained only an orange, a handful of almonds, and his rosary. He had donated his entire estate to the project.",ourVisit:"Aug 19 at 4pm. 🔶 Book tickets at sagradafamilia.org. Also book tower access — the view over Barcelona to the sea from the top is one of the great urban views in Europe."},
+  parkGuell:{title:"Park Güell",emoji:"🌿",heroFact:"Gaudí's mosaic wonderland — originally a failed luxury housing development",imageSearch:"https://www.google.com/search?q=Park+Guell+Barcelona+mosaic+terrace+view&tbm=isch",officialUrl:"https://www.parkguell.barcelona",history:"Commissioned in 1900 by industrialist Eusebi Güell for a luxury garden suburb — 60 plots for wealthy buyers. Only two houses were ever sold (one Gaudí's own). Abandoned in 1914, the city took over the land. What Güell got instead of a housing development was something far better: extraordinary stone viaducts, mosaic terraces, and fairy-tale gatehouses.",highlights:[{i:"🦎",l:"The Dragon Staircase",d:"The famous mosaic salamander/dragon in broken tile mosaic (trencadís) in gold, green, and turquoise. It's become the symbol of Barcelona."},{i:"🪑",l:"The Great Terrace",d:"The undulating ceramic bench curving around the main terrace with sweeping views of Barcelona and the sea. Created by Gaudí's assistant Jujol — a masterpiece of decorative art."},{i:"🏛️",l:"The Hypostyle Room",d:"86 columns support the Great Terrace above. The mosaic ceiling was made from fragments of cups, plates, and ceramics — reportedly waste from the construction site."}],didYouKnow:"Gaudí lived in Park Güell from 1906 until 1925. His house — the pink one — is now a museum. He went to confession every day and was famously eccentric and private.",ourVisit:"Aug 21 at 9am. 🔶 Book timed Monumental Zone entry. Morning before the crowds. Ref: 700586731861."},
+  montserrat:{title:"Montserrat Day Trip",emoji:"⛰️",heroFact:"A jagged mountain monastery that inspired Wagner and sheltered Catalan identity",imageSearch:"https://www.google.com/search?q=Montserrat+monastery+mountain+Barcelona&tbm=isch",officialUrl:null,history:"Montserrat ('jagged mountain' in Catalan) rises 1,236 metres northwest of Barcelona. Its serrated peaks inspired Wagner to set his opera Parsifal here. The Benedictine monastery has been on the mountain since the 9th century. It houses La Moreneta (the Black Madonna) — a 12th-century wooden statue and one of the most venerated icons in the world.",highlights:[{i:"🖤",l:"La Moreneta — the Black Madonna",d:"The dark-skinned Virgin of Montserrat, carved from poplar wood around 1100 AD. Pilgrims queue to touch her hand. Countless Spanish children are named Montserrat after her."},{i:"🚡",l:"Cable car up",d:"The Aeri de Montserrat takes 5 minutes and is spectacular — you rise almost vertically from the valley floor to the monastery at 725 metres with open views the whole way."},{i:"🥾",l:"Sant Joan funicular",d:"A second funicular goes higher up the mountain. Trails lead to the highest peak — views stretching to the Pyrenees and the sea on a clear day."}],didYouKnow:"During the Spanish Civil War, Montserrat was one of the few places in Catalonia where the Catalan language was openly maintained — the monastery became a symbol of Catalan resistance.",ourVisit:"Full day Aug 20 — R5 train from Plaça Espanya, cable car up, monastery + Black Madonna, Sant Joan funicular, lunch, rack railway down, back to Barcelona ~2:30pm."},
+  cosmoCaixa:{title:"CosmoCaixa Science Museum",emoji:"🔭",heroFact:"A living, breathing Amazon rainforest inside a museum",imageSearch:"https://www.google.com/search?q=CosmoCaixa+Barcelona+Amazon+rainforest+inside&tbm=isch",officialUrl:"https://www.cosmocaixa.org",history:"One of Europe's most innovative science museums. Its signature exhibit is the Bosc Inundat (Flooded Forest): a real, living, 1,000-square-metre Amazon rainforest ecosystem inside the museum — piranhas, anacondas, caiman, river turtles, and hundreds of plant species. Real rain falls. Real humidity hits you when you walk in.",highlights:[{i:"🌿",l:"The Amazon Rainforest",d:"Over 100 animal species and 40 different Amazonian tree types. Piranhas swim in the river. An anaconda lives here. Genuinely astonishing that this exists inside a building."},{i:"🪨",l:"The Geological Wall",d:"A cross-section through 100 rock types showing 4.5 billion years of Earth history in one wall. Surprisingly gripping."},{i:"🌌",l:"Planetarium",d:"Full-dome digital planetarium with shows in multiple languages. The 3D solar system tour is remarkable."}],didYouKnow:"Maintaining the tropical Amazon microclimate in Barcelona requires a complex system running 24 hours a day. The piranhas are fed on a specific schedule. Don't fall in.",ourVisit:"Aug 21 afternoon — perfect for Axel's last full day in Europe. Then Barceloneta Beach to finish the trip the right way."}
+};
+
+const DAYS=[
+  {id:1,day:"Mon",date:"Jul 27",city:"Depart NYC",flag:"🇺🇸",phase:"london",hotel:"—",schedule:[{t:"11:40pm",a:"Virgin Atlantic VS138 departs JFK",tp:"transport",d:"Confirmation: D2TJNP · Premium Class"}],notes:"Overnight flight — arrive London Tue Jul 28 at 12:05pm"},
+  {id:2,day:"Tue",date:"Jul 28",city:"London",flag:"🇬🇧",phase:"london",hotel:"The Clermont London, Charing Cross",confs:[{l:"Hotel",v:"ZO-AX1044-31234"}],schedule:[{t:"12:05pm",a:"Arrive London Heathrow",tp:"transport"},{t:"Afternoon",a:"Check in · Clermont Charing Cross",tp:"hotel"},{t:"Dana working",a:"Kids: Natural History Museum",tp:"activity",d:"Jay leads the kids"}],notes:"Paid in full — non-refundable (Amex)"},
+  {id:3,day:"Wed",date:"Jul 29",city:"London",flag:"🇬🇧",phase:"london",hotel:"The Clermont London",schedule:[{t:"Dana working",a:"Kids: Churchill War Rooms",tp:"activity"},{t:"Evening",a:"Family dinner together",tp:"food"}]},
+  {id:4,day:"Thu",date:"Jul 30",city:"London",flag:"🇬🇧",phase:"london",hotel:"The Clermont London",schedule:[{t:"Dana working",a:"Kids: Science Museum / V&A",tp:"activity"},{t:"Evening",a:"Evening activity TBD",tp:"activity"}]},
+  {id:5,day:"Fri",date:"Jul 31",city:"London → Naples",flag:"✈️",phase:"london",hotel:"De Bonart Hilton, Naples",confs:[{l:"Flight",v:"KCSVCJL"}],schedule:[{t:"7:25am",a:"EasyJet departs London Gatwick",tp:"transport",d:"Conf: KCSVCJL"},{t:"11:20am",a:"Arrive Naples",tp:"transport"},{t:"Afternoon",a:"Archaeological Museum (optional)",tp:"activity",d:"🔶 Book Now"},{t:"Evening",a:"Check in · De Bonart Hilton",tp:"hotel"}],todos:["Book transfer to Gatwick","Arrange transfer from Naples airport to Hilton"]},
+  {id:6,day:"Sat",date:"Aug 1",city:"Naples → Rome",flag:"🇮🇹",phase:"rome",hotel:"Navona Garden Suites, Rome",confs:[{l:"Pompeii Tour",v:"BR-1409479081"},{l:"Hotel",v:"58870851"}],schedule:[{t:"Morning",a:"Car from Naples hotel → Pompeii",tp:"transport",d:"🔶 Book Now"},{t:"9:10am",a:"Pompeii Tour · Viator",tp:"activity"},{t:"~1:00pm",a:"Car from Pompeii → Naples Centrale",tp:"transport"},{t:"1:55pm",a:"Train: Naples → Roma Termini",tp:"transport",d:"Conf: FCYJJ5 · Coach 3: 7A 7B 8A 8B"},{t:"3:05pm",a:"Arrive Rome · Check in",tp:"hotel"}],todos:["Book car: hotel → Pompeii","Book car: Pompeii → Naples station"]},
+  {id:7,day:"Sun",date:"Aug 2",city:"Rome",flag:"🇮🇹",phase:"rome",hotel:"Navona Garden Suites",schedule:[{t:"10:00am",a:"Golf Cart City Tour",tp:"activity",d:"Angel Tours · 10am–2pm"},{t:"2:00pm",a:"Hotel rest",tp:"free"},{t:"Evening",a:"Gelato Crawl + dinner",tp:"food"}],todos:["Plan Gelato Crawl route"],attrs:["golfCartRome"]},
+  {id:8,day:"Mon",date:"Aug 3",city:"Rome",flag:"🇮🇹",phase:"rome",hotel:"Navona Garden Suites",confs:[{l:"Colosseum",v:"BR-1413635837"}],schedule:[{t:"10:00am",a:"Colosseum Tour",tp:"activity",d:"Angel Tours · Conf: BR-1413635837"},{t:"1:00pm",a:"Lunch / Free Time",tp:"free"},{t:"5:00pm",a:"Gladiator School",tp:"activity",d:"🔶 Book Now"}],attrs:["colosseum","gladiatorSchool"]},
+  {id:9,day:"Tue",date:"Aug 4",city:"Rome",flag:"🇮🇹",phase:"rome",hotel:"Navona Garden Suites",confs:[{l:"Vatican",v:"LVO 671479"}],schedule:[{t:"7:30am",a:"Vatican Tour",tp:"activity",d:"LivTours · Conf: LVO 671479"},{t:"~12:00pm",a:"Free time / Lunch",tp:"free"},{t:"Afternoon",a:"Borghese Gardens + Rowboats",tp:"activity",d:"🔵 Research & book"}],attrs:["vatican","borghese"]},
+  {id:10,day:"Wed",date:"Aug 5",city:"Rome → Florence",flag:"🇮🇹",phase:"florence",hotel:"Orto de' Medici, Florence",confs:[{l:"Train",v:"27EC95"}],schedule:[{t:"Morning",a:"Relax / Pack / Check out",tp:"free"},{t:"2:10pm",a:"Train: Roma → Firenze",tp:"transport",d:"Conf: 27EC95 · Coach 3: 7A 7B 8A 8B"},{t:"3:46pm",a:"Arrive Florence",tp:"transport"},{t:"4:30pm",a:"Taxi to Piazzale Michelangelo",tp:"transport",d:"Sunset views — don't miss it"},{t:"Evening",a:"Walk back down, dinner",tp:"food"}],notes:"Free cancellation until Aug 4 · €786 due at check-in",attrs:["piazzaleMichelangelo"]},
+  {id:11,day:"Thu",date:"Aug 6",city:"Florence",flag:"🇮🇹",phase:"florence",hotel:"Orto de' Medici",confs:[{l:"Accademia",v:"Order #23054762"},{l:"Walking Tour",v:"XGQA14CUGL"}],schedule:[{t:"8:15am",a:"Accademia Gallery — Statue of David",tp:"activity",d:"Order #23054762"},{t:"10:00am",a:"Florence Walking Tour",tp:"activity",d:"Tour-Tale (Sylvia) · Conf: XGQA14CUGL · €178 paid"},{t:"12:00pm",a:"Free afternoon",tp:"free"}],attrs:["david"]},
+  {id:12,day:"Fri",date:"Aug 7",city:"Florence",flag:"🇮🇹",phase:"florence",hotel:"Orto de' Medici",confs:[{l:"Cooking Class",v:"MF: 38243"}],schedule:[{t:"9:30am",a:"Galileo Museum",tp:"activity"},{t:"11:00am",a:"Da Vinci Museum + Dana & Grace shopping",tp:"activity",d:"Santa Maria Novella Perfume Store"},{t:"1:30pm",a:"Break / Hotel rest",tp:"free"},{t:"5:30pm",a:"GF Cooking Class · Mama Florence",tp:"activity",d:"Conf: MF-38243 · Dedicated GF kitchen"}],attrs:["galileoMuseum","daVinciMuseum","santaMariaNovellaShop"]},
+  {id:13,day:"Sat",date:"Aug 8",city:"Florence → Venice",flag:"🇮🇹",phase:"venice",hotel:"Palazzo Keller – Laguna Suite",confs:[{l:"Train",v:"27EC95"},{l:"Hotel",v:"2026042647960623"}],schedule:[{t:"10:20am",a:"Train: Firenze → Venezia",tp:"transport",d:"Conf: 27EC95 · Coach 3: 7A 7B 8A 8B"},{t:"12:34pm",a:"Arrive Venice · Check in",tp:"hotel"},{t:"4:00pm",a:"Ca' Macana Mask Workshop",tp:"activity",d:"🔵 Pending · Family masks · English · 2hrs"},{t:"Golden hour",a:"Gondola Ride",tp:"activity",d:"Negotiate on-site — don't pre-book"}],notes:"Slow evening. Early night — big day tomorrow.",attrs:["venetianMasks","gondolaRide"]},
+  {id:14,day:"Sun",date:"Aug 9",city:"Venice",flag:"🇮🇹",phase:"venice",hotel:"Palazzo Keller – Laguna Suite",confs:[{l:"Doge's Palace – Adult 1",v:"1PGY2QU3ZZ"},{l:"Doge's Palace – Adult 2",v:"UXZBE9WN5E"},{l:"Doge's Palace – Youth 1",v:"XLCLB4U25X"},{l:"Doge's Palace – Youth 2",v:"PZ13VPWFAR"}],schedule:[{t:"9:00am",a:"Doge's Palace (Palazzo Ducale)",tp:"activity",d:"4 tickets · 2 adults €30 · 2 youth €15"},{t:"11:00am",a:"Libreria Acqua Alta Bookshop",tp:"activity"},{t:"12:00pm",a:"Free time / Lunch",tp:"free"},{t:"4:00pm",a:"St. Mark's Basilica",tp:"activity",d:"Pre-book entry to skip queues"}],notes:"⚠️ Jay's back — minimize standing. Pre-book everything. Bridges are the main challenge.",attrs:["dogesPalace","acquaAltaBookshop","stMarksBasilica"]},
+  {id:15,day:"Mon",date:"Aug 10",city:"Venice → Cruise",flag:"🚢",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"12:00pm",a:"Transfer: Rialto → Ravenna Porto Corsini",tp:"transport",d:"🔵 Pending · Private van + water taxi"},{t:"5:00pm",a:"Board Norwegian Viva",tp:"transport"},{t:"Evening",a:"Explore ship / dinner",tp:"food"}],notes:"Alert NCL about Jay's celiac on embarkation. Speak to maître d' first night."},
+  {id:16,day:"Tue",date:"Aug 11",city:"Dubrovnik",flag:"🇭🇷",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"10:00am",a:"Ship docks · Walk to Pile Gate",tp:"transport"},{t:"11:30am",a:"Game of Thrones Kings Landing Tour",tp:"activity",d:"GoT Tours · Dario · €75/person · Pay CASH · 🔶 Book Now"},{t:"~3:30pm",a:"City Walls Walk",tp:"activity",d:"Dubrovnik Pass · 1.5–2hr walk"},{t:"~5:30pm",a:"Mount Srđ Cable Car (optional)",tp:"activity"}],todos:["Buy Dubrovnik Pass","Confirm GoT Tour with Dario — pay cash on day"],attrs:["gotDubrovnik"]},
+  {id:17,day:"Wed",date:"Aug 12",city:"Bar, Montenegro",flag:"🇲🇪",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"8:00am",a:"Ship arrives Bar",tp:"transport"},{t:"Morning",a:"Stari Bar ruins (15 min taxi)",tp:"activity",d:"🔶 Jay finalizing plan"},{t:"Afternoon",a:"Beach time",tp:"free"},{t:"6:00pm",a:"Ship departs",tp:"transport"}],todos:["Finalize Bar shore excursion"]},
+  {id:18,day:"Thu",date:"Aug 13",city:"Sea Day",flag:"🌊",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"All day",a:"Pool day / Relax",tp:"free"},{t:"Afternoon",a:"Adults: Spa time",tp:"activity"},{t:"Evening",a:"Dinner at Cagney's Steakhouse",tp:"food",d:"Notify about GF for Jay"}],notes:"Kids decompress day. Adults recharge."},
+  {id:19,day:"Fri",date:"Aug 14",city:"Salerno / Amalfi",flag:"🇮🇹",phase:"cruise",hotel:"Norwegian Viva",confs:[{l:"Boat Tour",v:"Email from BluMediterraneo"}],schedule:[{t:"7:00am",a:"Ship arrives Salerno",tp:"transport"},{t:"9:30am",a:"Private Boat Tour: Positano + Amalfi",tp:"activity",d:"Blu Mediterraneo · WhatsApp: +39 389 959 1601"},{t:"~4:00pm",a:"Return to ship",tp:"transport"},{t:"6:00pm",a:"Ship departs",tp:"transport"}],attrs:["amalfiBoat"]},
+  {id:20,day:"Sat",date:"Aug 15",city:"Civitavecchia",flag:"⚓",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"6:45am",a:"Ship arrives Civitavecchia",tp:"transport"},{t:"Morning",a:"Explore port area",tp:"activity",d:"Ferragosto — most of Rome closed today"},{t:"All day",a:"Ship amenities / pool / spa",tp:"free"},{t:"6:00pm",a:"Ship departs",tp:"transport"}],notes:"Ferragosto (Aug 15) — Italian national holiday. Staying near ship is the smart call."},
+  {id:21,day:"Sun",date:"Aug 16",city:"Pisa",flag:"🇮🇹",phase:"cruise",hotel:"Norwegian Viva",confs:[{l:"Tower Tickets",v:"2228643737-01"}],schedule:[{t:"7:00am",a:"Ship arrives",tp:"transport"},{t:"9:00am",a:"Leaning Tower of Pisa",tp:"activity",d:"4 tickets · Conf: 2228643737-01 · €80 · Leave bags at cloakroom · 251 steps"},{t:"10:30am",a:"Piazza del Duomo — Cathedral & Baptistery",tp:"activity"},{t:"Afternoon",a:"Return to ship",tp:"transport"},{t:"10:00pm",a:"Ship departs",tp:"transport"}],notes:"⚠️ Late arrivals not refunded. Leave ALL bags at cloakroom before climbing.",attrs:["pisaTower"]},
+  {id:22,day:"Mon",date:"Aug 17",city:"Nice / Monaco",flag:"🇫🇷",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"7:00am",a:"Ship arrives Villefranche-sur-Mer",tp:"transport"},{t:"Morning",a:"Nice Old Town (Vieux-Nice)",tp:"activity",d:"Markets, Cours Saleya flower market"},{t:"~11:30am",a:"Train to Monaco",tp:"transport",d:"SNCF · ~20 min · ~€4"},{t:"12:00pm",a:"Casino de Monte-Carlo / Prince's Palace",tp:"activity"},{t:"3:15pm",a:"⚠️ Hard return — back to ship",tp:"transport",d:"Allow 45+ min back to Villefranche"},{t:"4:30pm",a:"Ship departs",tp:"transport"}],notes:"Hard return deadline: 3:15–3:30pm at ship."},
+  {id:23,day:"Tue",date:"Aug 18",city:"Mallorca",flag:"🇪🇸",phase:"cruise",hotel:"Norwegian Viva",schedule:[{t:"1:00pm",a:"Ship arrives Mallorca",tp:"transport"},{t:"Afternoon",a:"Cala Millor or Cala d'Or beach day",tp:"activity",d:"Taxi from port — arrive early"},{t:"9:00pm",a:"Ship departs",tp:"transport"}],todos:["Research Mallorca beach options"]},
+  {id:24,day:"Wed",date:"Aug 19",city:"Barcelona — Disembark",flag:"🇪🇸",phase:"barcelona",hotel:"Eric Vökel Gran Via Suites",confs:[{l:"Hotel",v:"5126"}],schedule:[{t:"Morning",a:"Disembark Norwegian Viva",tp:"transport"},{t:"Midday",a:"Check in · Eric Vökel Gran Via Suites",tp:"hotel",d:"Free cancellation until Aug 16 · €853.42 due at check-in"},{t:"4:00pm",a:"Sagrada Família",tp:"activity",d:"🔶 Book Now · sagradafamilia.org"},{t:"Evening",a:"Flamenco Dinner?",tp:"food",d:"🔵 Research"}],todos:["Book Sagrada Família tickets","Research Flamenco dinner"],attrs:["sagradaFamilia"]},
+  {id:25,day:"Thu",date:"Aug 20",city:"Barcelona",flag:"🇪🇸",phase:"barcelona",hotel:"Eric Vökel Gran Via Suites",schedule:[{t:"8:00am",a:"Montserrat Day Trip",tp:"activity",d:"🔶 Book Now · R5 train + cable car · Monastery + Black Madonna"},{t:"Evening",a:"Flamenco Show (optional)",tp:"activity"}],todos:["Plan & book Montserrat day trip"],attrs:["montserrat"]},
+  {id:26,day:"Fri",date:"Aug 21",city:"Barcelona",flag:"🇪🇸",phase:"barcelona",hotel:"Eric Vökel Gran Via Suites",confs:[{l:"Park Güell ref",v:"700586731861"}],schedule:[{t:"9:00am",a:"Park Güell — Monumental Zone",tp:"activity",d:"🔶 Book Now · parkguell.barcelona"},{t:"11:00am",a:"El Born / Gothic Quarter wander",tp:"activity"},{t:"1:00pm",a:"CosmoCaixa Science Museum",tp:"activity",d:"Perfect for Axel!"},{t:"3:00pm",a:"Barceloneta Beach",tp:"free"},{t:"Evening",a:"Montjuïc Cable Car",tp:"activity",d:"🔶 Book Now · Sunset views"}],todos:["Book Park Güell","Book Montjuïc Cable Car"],attrs:["parkGuell","cosmoCaixa"]},
+  {id:27,day:"Sat",date:"Aug 22",city:"Fly Home",flag:"✈️",phase:"barcelona",hotel:"—",schedule:[{t:"Early",a:"Transfer to Barcelona Airport",tp:"transport",d:"🔶 Book Now · Allow 3 hours"},{t:"10:55am",a:"Delta DL129 — BCN → JFK",tp:"transport"}],todos:["Book transfer to Barcelona Airport"]}
+];
+
+const HOTELS=[
+  {city:"London",dates:"Jul 28–31 (3 nights)",name:"The Clermont London, Charing Cross",url:"https://www.theclermont.co.uk",conf:"ZO-AX1044-31234",notes:"Paid in full — non-refundable"},
+  {city:"Naples",dates:"Jul 31–Aug 1 (1 night)",name:"De Bonart Hilton Naples",url:"https://www.hilton.com/en/hotels/napcchh-hilton-naples/",conf:"—",notes:"Paid in full — non-refundable"},
+  {city:"Rome",dates:"Aug 1–5 (5 nights)",name:"Navona Garden Suites",url:"https://navaonagardenssuites.com",conf:"58870851",notes:"Near Piazza Navona"},
+  {city:"Florence",dates:"Aug 5–8 (3 nights)",name:"Orto de' Medici",url:"https://www.ortodemedicifirenze.it",conf:"72073376381971",notes:"Free cancellation until Aug 4 · €786 due at check-in"},
+  {city:"Venice",dates:"Aug 8–10 (2 nights)",name:"Palazzo Keller – Laguna Suite",url:"https://www.palazzokeller.com",conf:"2026042647960623",notes:"Paid in full — non-refundable"},
+  {city:"Cruise",dates:"Aug 10–19 (9 nights)",name:"Norwegian Viva",url:"https://www.ncl.com/ships/norwegian-viva",conf:"N/A",notes:"Embark Ravenna 5pm · Disembark Barcelona"},
+  {city:"Barcelona",dates:"Aug 19–22 (3 nights)",name:"Eric Vökel Gran Via Suites",url:"https://ericvokelhotels.com/gran-via",conf:"5126",notes:"Free cancellation until Aug 16 · €853.42 due at check-in"}
+];
+
+const TRANSPORT=[
+  {date:"Jul 27",route:"JFK → LHR",carrier:"Virgin Atlantic VS138",time:"23:40 → 12:05+1",conf:"D2TJNP",cls:"Premium"},
+  {date:"Jul 31",route:"LGW → NAP",carrier:"EasyJet",time:"7:25 → 11:20",conf:"KCSVCJL",cls:"Economy"},
+  {date:"Aug 1",route:"Naples → Roma Termini",carrier:"Trenitalia",time:"13:55 → 15:05",conf:"FCYJJ5",cls:"Coach 3: 7A 7B 8A 8B"},
+  {date:"Aug 5",route:"Roma → Firenze S.M.N.",carrier:"Trenitalia",time:"14:10 → 15:46",conf:"27EC95",cls:"Coach 3: 7A 7B 8A 8B"},
+  {date:"Aug 8",route:"Firenze → Venezia S.L.",carrier:"Trenitalia",time:"10:20 → 12:34",conf:"27EC95",cls:"Coach 3: 7A 7B 8A 8B"},
+  {date:"Aug 10",route:"Venice → Ravenna Porto Corsini",carrier:"Private transfer",time:"Depart ~noon",conf:"🔵 Pending",cls:"Private Van"},
+  {date:"Aug 22",route:"BCN → JFK",carrier:"Delta DL129",time:"10:55 → —",conf:"—",cls:"Economy"}
+];
+
+const GF=[
+  {city:"General",name:"Key phrases",type:"Phrase",notes:"'Sono celiaco – senza glutine per favore' · 'C'è glutine?' (Does it contain gluten?)",url:null},
+  {city:"General",name:"AIC Certification",type:"✅ Gold Standard",notes:"Look for AIC (Associazione Italiana Celiachia) symbol — gold standard for celiac-safe dining.",url:"https://www.aic.it"},
+  {city:"Rome",name:"Mama Eat",type:"✅ Dedicated GF",notes:"100% dedicated GF kitchen in Trastevere. One of the safest celiac restaurants in Rome.",url:"https://www.mamaeats.com"},
+  {city:"Rome",name:"Il Sorpasso",type:"✅ GF options",notes:"Natural GF Venetian-style cicchetti. Great casual lunch.",url:null},
+  {city:"Rome",name:"Supplì Roma",type:"⚠️ Inquire",notes:"Some supplì are GF — always ask.",url:null},
+  {city:"Florence",name:"Buca Mario",type:"✅ GF menu",notes:"Historic Tuscan restaurant with strong GF awareness.",url:null},
+  {city:"Florence",name:"Mercato Centrale",type:"✅ Many GF",notes:"Top floor food hall — meats, cheeses, salads naturally GF.",url:"https://www.mercatocentrale.it/firenze"},
+  {city:"Venice",name:"Cicchetti bars",type:"✅ Usually safe",notes:"Polenta, fish, cured meats on polenta = naturally GF. Avoid bread-based ones.",url:null},
+  {city:"Venice",name:"Ai Promessi Sposi",type:"✅ GF options",notes:"Popular bacaro with GF-friendly options.",url:null},
+  {city:"Barcelona",name:"General note",type:"✅ GF-friendly",notes:"Catalan cuisine is heavily rice, fish, and vegetable based.",url:null},
+  {city:"Barcelona",name:"La Pepita",type:"✅ GF labeled",notes:"Labels all GF pintxos clearly.",url:null}
+];
+
+const CITIES=[
+  {key:"london",name:"London",flag:"🇬🇧",accent:"#9B8FFF",tagline:"The city that invented cool — and then made it polite.",intro:"London is one of the world's great capitals: ancient history layered under modern energy, world-class museums (most free), iconic landmarks around every corner.",tips:["Oyster card or contactless for the Tube — don't buy single tickets","Walk across Tower Bridge at dusk","Afternoon tea is worth splurging on once"],search:"https://www.google.com/search?q=things+to+do+London+2026",highlights:[{icon:"🦕",title:"Natural History Museum",desc:"Dinosaur skeletons, blue whale, gems vault. Free.",url:"https://www.nhm.ac.uk",attr:null},{icon:"⚔️",title:"Churchill War Rooms",desc:"The actual underground bunker where Churchill ran WWII.",url:"https://www.iwm.org.uk/visits/churchill-war-rooms",attr:null},{icon:"🔬",title:"Science Museum",desc:"Rockets, space capsules, IMAX — hands-on and spectacular.",url:"https://www.sciencemuseum.org.uk",attr:null},{icon:"🎨",title:"V&A Museum",desc:"Fashion, design, and art across 5,000 years. Grace will love this.",url:"https://www.vam.ac.uk",attr:null}]},
+  {key:"rome",name:"Rome",flag:"🇮🇹",accent:"#E8547A",tagline:"2,700 years of history — and the best pasta on earth.",intro:"Rome is overwhelming in the best possible way. Every street has a story. Ancient ruins stand next to Renaissance fountains next to modern cafés.",tips:["Toss a coin in the Trevi Fountain — legend says it guarantees your return","The best gelato is NOT in tourist areas — look for 'artigianale'","Cover shoulders & knees for Vatican and churches"],search:"https://www.google.com/search?q=things+to+do+Rome+Italy+2026",highlights:[{icon:"🏛️",title:"The Colosseum",desc:"50,000–80,000 seat arena. Angel Tours guide will bring it alive.",url:"https://www.colosseo.it",attr:"colosseum"},{icon:"⚔️",title:"Gladiator School",desc:"Learn to fight like a Roman gladiator. Axel will lose his mind.",url:null,attr:"gladiatorSchool"},{icon:"🛺",title:"Golf Cart City Tour",desc:"Cover Rome's highlights without destroying your feet.",url:null,attr:"golfCartRome"},{icon:"⛪",title:"Vatican & Sistine Chapel",desc:"Michelangelo spent 4 years painting the ceiling.",url:"https://www.museivaticani.va",attr:"vatican"},{icon:"🌳",title:"Borghese Gardens",desc:"Rome's most beautiful park — row boats on the lake.",url:null,attr:"borghese"}]},
+  {key:"florence",name:"Florence",flag:"🇮🇹",accent:"#00C4D8",tagline:"Where the Renaissance was born — and the bistecca is legendary.",intro:"Florence (Firenze) is compact, walkable, and packed with masterpieces. The birthplace of the Renaissance.",tips:["Pre-book Accademia — lines without reservations are brutal in August","Ponte Vecchio at dawn is magical","Try bistecca alla Fiorentina — the Tuscan T-bone is legendary"],search:"https://www.google.com/search?q=things+to+do+Florence+Italy+2026",highlights:[{icon:"🗿",title:"Accademia Gallery — David",desc:"17 feet tall, carved from a single marble block.",url:null,attr:"david"},{icon:"🔭",title:"Galileo Museum",desc:"Galileo's actual telescopes — the ones he used to discover Jupiter's moons.",url:null,attr:"galileoMuseum"},{icon:"🎭",title:"Da Vinci Museum",desc:"Working models of Leonardo's flying machines and tanks.",url:null,attr:"daVinciMuseum"},{icon:"🌅",title:"Piazzale Michelangelo",desc:"The most famous view in Florence at golden hour.",url:null,attr:"piazzaleMichelangelo"},{icon:"🌸",title:"Santa Maria Novella Pharmacy",desc:"World's oldest pharmacy, founded 1221. Extraordinary perfumes.",url:null,attr:"santaMariaNovellaShop"}]},
+  {key:"venice",name:"Venice",flag:"🇮🇹",accent:"#B794F4",tagline:"118 islands, 400 bridges, zero cars — the most extraordinary city on earth.",intro:"Venice is unlike anywhere else. Built on water, slowly sinking, and yet one of the most beautiful places humans have ever created.",tips:["Jay's back — bridges are the main challenge. Plan rest stops.","Vaporetto (water bus) is cheap and scenic","Pre-book everything to avoid standing in queues"],search:"https://www.google.com/search?q=things+to+do+Venice+Italy+2026",highlights:[{icon:"🏛️",title:"Doge's Palace",desc:"Seat of Venetian power for 700 years. Home to the world's largest oil painting.",url:null,attr:"dogesPalace"},{icon:"📚",title:"Libreria Acqua Alta",desc:"Books in gondolas and bathtubs, cats everywhere.",url:null,attr:"acquaAltaBookshop"},{icon:"⛪",title:"St. Mark's Basilica",desc:"40,000 square feet of gold mosaic.",url:null,attr:"stMarksBasilica"},{icon:"🎭",title:"Ca' Macana Mask Workshop",desc:"Make your own Venetian carnival mask.",url:null,attr:"venetianMasks"},{icon:"🚣",title:"Gondola Ride",desc:"Worth it. Negotiate at golden hour — don't pre-book.",url:null,attr:"gondolaRide"}]},
+  {key:"cruise",name:"Norwegian Viva Cruise",flag:"🚢",accent:"#60C8F5",tagline:"Eight ports, nine nights, one incredible ship.",intro:"The Norwegian Viva (2023). 965 feet long, 20+ restaurants. Croatia, Montenegro, Italy, France, and Spain.",tips:["NCL GF: notify on embarkation AND speak to maître d' first night","Pack neck cooling fans — August Med is brutal","Sea day = spa for adults, pool for kids"],search:"https://www.google.com/search?q=Norwegian+Viva+cruise+Mediterranean+tips",highlights:[{icon:"🐉",title:"Dubrovnik — Game of Thrones",desc:"King's Landing is real. Primary GoT filming location.",url:null,attr:"gotDubrovnik"},{icon:"⛵",title:"Salerno — Amalfi Coast by Boat",desc:"The only way to truly see the Amalfi Coast.",url:null,attr:"amalfiBoat"},{icon:"🗼",title:"Pisa — The Leaning Tower",desc:"251 steps. Tickets confirmed for 9am.",url:null,attr:"pisaTower"},{icon:"🎰",title:"Nice & Monaco",desc:"Nice Old Town, then 20-min train to Monaco. Hard return 3:15pm.",url:null,attr:null},{icon:"🏖️",title:"Mallorca Beach Day",desc:"Cala Millor or Cala d'Or — beautiful Mediterranean beaches.",url:null,attr:null}]},
+  {key:"barcelona",name:"Barcelona",flag:"🇪🇸",accent:"#F687B3",tagline:"Gaudí's fever dream made real — plus the best beach in Europe.",intro:"Barcelona hits differently. Gaudí's architecture alone is worth the flight. Add perfect weather, incredible food, and a beach right in the city.",tips:["Gothic Quarter is perfect for wandering — watch your pockets","Barceloneta beach is walkable from the city center","Flamenco shows in BCN are spectacular"],search:"https://www.google.com/search?q=things+to+do+Barcelona+Spain+2026",highlights:[{icon:"⛪",title:"Sagrada Família",desc:"Under construction since 1882. A forest of stone columns in kaleidoscopic light.",url:null,attr:"sagradaFamilia"},{icon:"🌿",title:"Park Güell",desc:"Gaudí's mosaic wonderland — rainbow terraces, fairy-tale gatehouses.",url:null,attr:"parkGuell"},{icon:"⛰️",title:"Montserrat Day Trip",desc:"A jagged mountain monastery with the Black Madonna.",url:null,attr:"montserrat"},{icon:"🔭",title:"CosmoCaixa Science Museum",desc:"A living Amazon rainforest inside a museum. Perfect for Axel.",url:null,attr:"cosmoCaixa"},{icon:"🌅",title:"Montjuïc Cable Car",desc:"Sunset views over the city and harbor.",url:null,attr:null}]}
+];
+
+// ---- STATE ----
+let currentTab="itinerary";
+let currentDay=null;
+let currentAttr=null;
+let currentCity=null;
+let itinFilterType="city";
+let itinFilterPhase="all";
+let itinFilterDay="all";
+let logView="hotels";
+
+function showTab(tab){
+  currentTab=tab;currentDay=null;currentAttr=null;currentCity=null;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.getElementById('nav-'+tab).classList.add('active');
+  render();
+}
+
+function render(){
+  if(currentTab==="itinerary") renderItinerary();
+  if(currentTab==="cities") renderCities();
+  if(currentTab==="logistics") renderLogistics();
+  if(currentTab==="gf") renderGF();
+}
+
+// ---- HELPERS ----
+function ac(phase){return (PC[phase]||PC.london).a;}
+function badge(s){
+  if(!s)return'';
+  if(s==="✅")return'<span class="tag confirmed">Confirmed</span>';
+  if(s&&s.includes("Pending"))return'<span class="tag pending">Pending</span>';
+  return'<span class="tag booknow">Book Now</span>';
+}
+function el(tag,attrs,inner){
+  const a=Object.entries(attrs||{}).map(([k,v])=>`${k}="${v}"`).join(' ');
+  return`<${tag}${a?' '+a:''}>${inner||''}</${tag}>`;
+}
+
+// ---- ATTR DETAIL ----
+function renderAttr(key,backFn,accent){
+  const a=ATTR[key]; if(!a) return;
+  const acc=accent||"#9B8FFF";
+  const container=currentTab==="itinerary"?document.getElementById('screen-itinerary'):document.getElementById('screen-cities');
+  container.innerHTML=`
+    <button class="back-btn" onclick="${backFn}()">← Back</button>
+    <div class="hero" style="background:linear-gradient(135deg,${acc}22,${acc}08);border:1px solid ${acc}40">
+      <div style="font-size:36px;margin-bottom:8px">${a.emoji}</div>
+      <div style="color:#f0f4ff;font-weight:800;font-size:22px;line-height:1.2;margin-bottom:8px">${a.title}</div>
+      <div style="color:${acc};font-weight:600;font-size:13px;font-style:italic;margin-bottom:12px">${a.heroFact}</div>
+      <div style="color:#cbd5e1;font-size:14px;line-height:1.7">${a.history}</div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <a href="${a.imageSearch}" target="_blank" style="background:rgba(96,200,245,0.12);color:#60C8F5;font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;text-decoration:none">📸 See photos</a>
+        ${a.officialUrl?`<a href="${a.officialUrl}" target="_blank" style="background:${acc}18;color:${acc};font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;text-decoration:none">🌐 Official site ↗</a>`:''}
+      </div>
+    </div>
+    <div class="section-label" style="color:${acc}">Highlights & Insider Facts</div>
+    ${a.highlights.map(h=>`
+      <div class="card" style="display:flex;gap:12px">
+        <span style="font-size:22px;flex-shrink:0">${h.i}</span>
+        <div><div style="color:#f0f4ff;font-weight:700;font-size:14px;margin-bottom:4px">${h.l}</div><div style="color:#94a3b8;font-size:13px;line-height:1.55">${h.d}</div></div>
+      </div>`).join('')}
+    <div class="did-you-know">
+      <div style="color:#fbbf24;font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">💡 Did you know?</div>
+      <div style="color:#fde68a;font-size:13px;line-height:1.6">${a.didYouKnow}</div>
+    </div>
+    ${a.ourVisit?`<div class="our-visit" style="background:${acc}12;border:1px solid ${acc}30">
+      <div style="color:${acc};font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">✈️ Our Visit</div>
+      <div style="color:#cbd5e1;font-size:13px;line-height:1.6">${a.ourVisit}</div>
+    </div>`:''}
+  `;
+}
+
+// ---- ITINERARY ----
+function renderItinerary(){
+  const el=document.getElementById('screen-itinerary');
+  if(currentAttr){renderAttr(currentAttr,'backFromAttr',ac(currentDay?.phase));return;}
+  if(currentDay){renderDayDetail();return;}
+  const phases=[{k:"all",l:"All"},{k:"london",l:"🇬🇧 London"},{k:"rome",l:"🇮🇹 Rome"},{k:"florence",l:"🇮🇹 Florence"},{k:"venice",l:"🇮🇹 Venice"},{k:"cruise",l:"🚢 Cruise"},{k:"barcelona",l:"🇪🇸 Barcelona"}];
+  const filtered=itinFilterType==="city"?(itinFilterPhase==="all"?DAYS:DAYS.filter(d=>d.phase===itinFilterPhase)):(itinFilterDay==="all"?DAYS:DAYS.filter(d=>d.id===parseInt(itinFilterDay)));
+  el.innerHTML=`
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="filter-btn${itinFilterType==='city'?' active':''}" onclick="setItinFilter('city')">By Destination</button>
+      <button class="filter-btn${itinFilterType==='day'?' active':''}" onclick="setItinFilter('day')">Jump to Day</button>
+    </div>
+    ${itinFilterType==='city'?`<div class="pills">${phases.map(p=>{const col=PC[p.k]?.a||'#7B6FF0';const act=itinFilterPhase===p.k;return`<button class="pill${act?' active':''}" style="${act?`background:${col};border-color:${col};color:#fff`:''}" onclick="setPhase('${p.k}')">${p.l}</button>`;}).join('')}</div>`:`<select onchange="setItinDay(this.value)"><option value="all">— Select a day —</option>${DAYS.map(d=>`<option value="${d.id}"${itinFilterDay==d.id?' selected':''}>${d.day} ${d.date} — ${d.city}</option>`).join('')}</select>`}
+    ${filtered.map(day=>{const col=ac(day.phase);return`<div class="card clickable" style="border-left:3px solid ${col}" onclick="openDay(${day.id})">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:${col}20;border:1px solid ${col}50;border-radius:8px;min-width:46px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="font-size:20px;line-height:1">${day.flag}</span>
+          <span style="color:${col};font-size:9px;font-weight:700;margin-top:2px">${day.date}</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="color:#f0f4ff;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${day.city}</div>
+          <div style="color:#94a3b8;font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${day.schedule?.[0]?.a||'—'}</div>
+        </div>
+        <span style="color:#475569;font-size:18px">›</span>
+      </div>
+    </div>`;}).join('')}
+  `;
+}
+
+function renderDayDetail(){
+  const day=currentDay;
+  const col=ac(day.phase);
+  const el=document.getElementById('screen-itinerary');
+  el.innerHTML=`
+    <button class="back-btn" onclick="backFromDay()">← Back</button>
+    <div class="hero" style="background:linear-gradient(135deg,${col}20,${col}08);border:1px solid ${col}40">
+      <div style="font-size:28px;margin-bottom:5px">${day.flag}</div>
+      <div style="color:#f0f4ff;font-weight:800;font-size:22px;line-height:1.2;margin-bottom:3px">${day.city}</div>
+      <div style="color:${col};font-weight:600;font-size:13px">${day.day}, ${day.date}</div>
+      ${day.hotel&&day.hotel!=='—'?`<div style="color:#94a3b8;font-size:13px;margin-top:8px">🏨 ${day.hotel}</div>`:''}
+      ${day.notes?`<div class="note">${day.notes}</div>`:''}
+    </div>
+    <div class="section-label" style="color:${col}">Daily Rundown</div>
+    ${day.schedule.map((item,i)=>`
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="timeline-dot" style="background:${col}20;border:1px solid ${col}40">${TI[item.tp]||'📌'}</div>
+          ${i<day.schedule.length-1?`<div class="timeline-line" style="background:${col}25"></div>`:''}
+        </div>
+        <div style="flex:1;padding-bottom:2px">
+          <div style="color:#7c9cbf;font-size:11px;font-weight:600;margin-bottom:2px">${item.t}</div>
+          <div style="color:#f0f4ff;font-weight:600;font-size:14px;line-height:1.35">${item.a}</div>
+          ${item.d?`<div style="color:#94a3b8;font-size:13px;margin-top:3px;line-height:1.5">${item.d}</div>`:''}
+        </div>
+      </div>`).join('')}
+    ${day.attrs?.length?`<div class="section-label" style="color:${col};margin-top:8px">📖 Learn More</div>${day.attrs.map(k=>{const a=ATTR[k];if(!a)return'';return`<div class="attr-btn" style="border-color:${col}30" onclick="openAttrFromDay('${k}')"><span style="font-size:22px">${a.emoji}</span><div style="flex:1"><div style="color:#f0f4ff;font-weight:700;font-size:14px">${a.title}</div><div style="color:#64748b;font-size:12px;margin-top:2px">${a.heroFact}</div></div><span style="color:${col};font-size:16px">›</span></div>`;}).join('')}`:''}
+    ${day.confs?.length?`<div class="conf-box"><div class="section-label" style="color:#60C8F5">🎫 Confirmations</div>${day.confs.map(c=>`<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px"><span style="color:#94a3b8;font-size:13px">${c.l}</span><span class="code">${c.v}</span></div>`).join('')}</div>`:''}
+    ${day.todos?.length?`<div class="todo-box"><div class="section-label" style="color:#fbbf24">⚠️ Still To Do</div>${day.todos.map(t=>`<div style="color:#fde68a;font-size:13px;margin-bottom:6px;display:flex;gap:8px;line-height:1.5"><span style="color:#f59e0b;flex-shrink:0">•</span><span>${t}</span></div>`).join('')}</div>`:''}
+  `;
+}
+
+function setItinFilter(t){itinFilterType=t;renderItinerary();}
+function setPhase(p){itinFilterPhase=p;renderItinerary();}
+function setItinDay(v){itinFilterDay=v;renderItinerary();}
+function openDay(id){currentDay=DAYS.find(d=>d.id===id);currentAttr=null;renderItinerary();}
+function backFromDay(){currentDay=null;currentAttr=null;renderItinerary();}
+function openAttrFromDay(key){currentAttr=key;renderItinerary();}
+function backFromAttr(){currentAttr=null;if(currentDay)renderDayDetail();else renderItinerary();}
+
+// ---- CITIES ----
+function renderCities(){
+  const el=document.getElementById('screen-cities');
+  if(currentAttr&&currentCity){renderAttr(currentAttr,'backFromCityAttr',CITIES.find(c=>c.key===currentCity)?.accent);return;}
+  if(currentCity){renderCityDetail();return;}
+  el.innerHTML=`
+    <div style="color:#94a3b8;font-size:14px;line-height:1.6;margin-bottom:18px">Tap a city to explore what we're doing there, learn the history, and get insider tips.</div>
+    ${CITIES.map(c=>`<div class="card clickable" style="border-left:3px solid ${c.accent}" onclick="openCity('${c.key}')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:30px">${c.flag}</span>
+        <div style="flex:1"><div style="color:#f0f4ff;font-weight:700;font-size:16px">${c.name}</div><div style="color:#94a3b8;font-size:13px;margin-top:2px;font-style:italic">${c.tagline}</div></div>
+        <span style="color:#475569;font-size:20px">›</span>
+      </div>
+    </div>`).join('')}
+  `;
+}
+
+function renderCityDetail(){
+  const c=CITIES.find(x=>x.key===currentCity);
+  const el=document.getElementById('screen-cities');
+  el.innerHTML=`
+    <button class="back-btn" onclick="backFromCity()">← All Cities</button>
+    <div class="hero" style="background:linear-gradient(135deg,${c.accent}22,${c.accent}08);border:1px solid ${c.accent}40">
+      <div style="font-size:32px;margin-bottom:6px">${c.flag}</div>
+      <div style="color:#f0f4ff;font-weight:800;font-size:24px;line-height:1.2;margin-bottom:5px">${c.name}</div>
+      <div style="color:${c.accent};font-weight:600;font-size:13px;margin-bottom:12px;font-style:italic">${c.tagline}</div>
+      <div style="color:#cbd5e1;font-size:14px;line-height:1.7">${c.intro}</div>
+      <a href="${c.search}" target="_blank" style="display:inline-block;margin-top:14px;color:#60C8F5;font-size:13px;text-decoration:none;font-weight:600">🔍 Google tips for ${c.name} →</a>
+    </div>
+    <div class="section-label" style="color:${c.accent}">What We're Doing There</div>
+    ${c.highlights.map(h=>`
+      <div class="card${h.attr?' clickable':''}" style="border:1px solid ${h.attr?c.accent+'40':'#1e3352'};display:flex;gap:12px;align-items:flex-start" ${h.attr?`onclick="openCityAttr('${h.attr}')"`:''}> 
+        <span style="font-size:26px;flex-shrink:0;margin-top:2px">${h.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="color:#f0f4ff;font-weight:700;font-size:14px;margin-bottom:3px">${h.title}</div>
+          <div style="color:#94a3b8;font-size:13px;line-height:1.45">${h.desc}</div>
+          ${h.attr?`<div style="color:${c.accent};font-size:12px;margin-top:5px;font-weight:600">Tap for full history & highlights →</div>`:h.url?`<a href="${h.url}" target="_blank" onclick="event.stopPropagation()" style="color:#60C8F5;font-size:12px;margin-top:5px;display:inline-block;text-decoration:none">Website ↗</a>`:''}
+        </div>
+        ${h.attr?`<span style="color:${c.accent};font-size:18px;flex-shrink:0">›</span>`:''}
+      </div>`).join('')}
+    <div style="background:#0e1e33;border:1px solid #1e3352;border-radius:12px;padding:16px;margin-top:6px">
+      <div class="section-label" style="color:#fbbf24">💡 Insider Tips</div>
+      ${c.tips.map(t=>`<div style="color:#cbd5e1;font-size:13px;line-height:1.55;margin-bottom:7px;display:flex;gap:8px"><span style="color:#fbbf24;flex-shrink:0">✦</span><span>${t}</span></div>`).join('')}
+    </div>
+  `;
+}
+
+function openCity(key){currentCity=key;currentAttr=null;renderCities();}
+function backFromCity(){currentCity=null;currentAttr=null;renderCities();}
+function openCityAttr(key){currentAttr=key;renderCities();}
+function backFromCityAttr(){currentAttr=null;renderCityDetail();}
+
+// ---- LOGISTICS ----
+function renderLogistics(){
+  const el=document.getElementById('screen-logistics');
+  el.innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:18px">
+      <button onclick="setLog('hotels')" style="background:${logView==='hotels'?'#00C4D8':'#152033'};border:1.5px solid ${logView==='hotels'?'#00C4D8':'#1e3352'};color:${logView==='hotels'?'#0D1B3E':'#94a3b8'};border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700">🏨 Hotels</button>
+      <button onclick="setLog('transport')" style="background:${logView==='transport'?'#00C4D8':'#152033'};border:1.5px solid ${logView==='transport'?'#00C4D8':'#1e3352'};color:${logView==='transport'?'#0D1B3E':'#94a3b8'};border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700">🚂 Transport</button>
+    </div>
+    ${logView==='hotels'?HOTELS.map(h=>`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="color:#00C4D8;font-weight:700;font-size:13px">${h.city}</div>
+        <span class="tag confirmed">Confirmed</span>
+      </div>
+      <a href="${h.url}" target="_blank" style="color:#f0f4ff;font-weight:700;font-size:15px;text-decoration:none;border-bottom:1px dashed #3a5070;padding-bottom:1px">${h.name} ↗</a>
+      <div style="color:#7c9cbf;font-size:13px;margin-top:7px;margin-bottom:5px">${h.dates}</div>
+      ${h.conf&&h.conf!=='—'&&h.conf!=='N/A'?`<div style="color:#94a3b8;font-size:13px;margin-bottom:4px">Conf: <span class="code">${h.conf}</span></div>`:''}
+      <div style="color:#7c9cbf;font-size:13px">${h.notes}</div>
+    </div>`).join(''):TRANSPORT.map(f=>`<div class="card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <div style="color:#9B8FFF;font-weight:700;font-size:13px">${f.date}</div>
+        <span class="tag ${f.conf==='🔵 Pending'?'pending':'confirmed'}">${f.conf==='🔵 Pending'?'Pending':'Confirmed'}</span>
+      </div>
+      <div style="color:#f0f4ff;font-weight:700;font-size:15px;margin-bottom:5px">${f.route}</div>
+      <div style="color:#94a3b8;font-size:13px;margin-bottom:3px">${f.carrier} · ${f.time}</div>
+      <div style="color:#7c9cbf;font-size:13px;margin-bottom:${f.conf&&f.conf!=='—'?'5':'0'}px">${f.cls}</div>
+      ${f.conf&&f.conf!=='—'&&f.conf!=='🔵 Pending'?`<div style="color:#94a3b8;font-size:13px">Conf: <span class="code">${f.conf}</span></div>`:''}
+    </div>`).join('')}
+  `;
+}
+function setLog(v){logView=v;renderLogistics();}
+
+// ---- GF ----
+function renderGF(){
+  const el=document.getElementById('screen-gf');
+  const cities=[...new Set(GF.map(g=>g.city))];
+  el.innerHTML=`
+    <div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:12px;padding:14px;margin-bottom:18px">
+      <div style="color:#4ade80;font-weight:700;font-size:15px;margin-bottom:5px">🌾 Jay's Celiac Travel Guide</div>
+      <div style="color:#94a3b8;font-size:13px;line-height:1.6">Key phrase: <span style="color:#f0f4ff;font-style:italic">"Sono celiaco – senza glutine per favore"</span></div>
+    </div>
+    ${cities.map(city=>`<div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="color:#4ade80;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px">${city}</div>
+        <a href="https://www.google.com/search?q=gluten+free+celiac+${encodeURIComponent(city)}" target="_blank" style="color:#60C8F5;font-size:12px;font-weight:600;text-decoration:none;background:rgba(96,200,245,0.1);padding:4px 11px;border-radius:12px">Search ${city} →</a>
+      </div>
+      ${GF.filter(g=>g.city===city).map(g=>`<div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;flex-wrap:wrap;gap:4px">
+          <div style="color:#f0f4ff;font-weight:600;font-size:14px">${g.url?`<a href="${g.url}" target="_blank" style="color:#f0f4ff;text-decoration:none;border-bottom:1px dashed #3a5070">${g.name} ↗</a>`:g.name}</div>
+          <span class="gf-tag">${g.type}</span>
+        </div>
+        <div style="color:#94a3b8;font-size:13px;line-height:1.55">${g.notes}</div>
+      </div>`).join('')}
+    </div>`).join('')}
+  `;
+}
+
+// ---- INIT ----
+render();
+</script>
+</body>
+</html>
